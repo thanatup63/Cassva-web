@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>การคำนวณปริมาณฮอร์โมนและยาฆ่าหญ้าสำหรับมันสำปะหลัง</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f8ff;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #2e8b57;
+            text-align: center;
+        }
+        form {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #2e8b57;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #2e8b57;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #3cb371;
+        }
+        .result {
+            background-color: #e6f3ff;
+            border: 1px solid #2e8b57;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .result h3 {
+            margin-top: 0;
+            color: #2e8b57;
+        }
+        .result p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>การคำนวณปริมาณฮอร์โมนและยาฆ่าหญ้าสำหรับมันสำปะหลัง</h1>
+        
+        <form id="chemicalForm">
+            <h2>ข้อมูลแปลง</h2>
+            <label for="fieldSize">ขนาดแปลง (ไร่):</label>
+            <input type="number" id="fieldSize" required min="0.1" step="0.1">
+            
+            <h2>ฮอร์โมน</h2>
+            <label for="hormoneType">ชนิดฮอร์โมน:</label>
+            <select id="hormoneType" required>
+                <option value="">เลือกชนิดฮอร์โมน</option>
+                <option value="auxin">ออกซิน (Auxin)</option>
+                <option value="cytokinin">ไซโตไคนิน (Cytokinin)</option>
+                <option value="gibberellin">จิบเบอเรลลิน (Gibberellin)</option>
+            </select>
+            
+            <label for="hormoneConcentration">ความเข้มข้นที่แนะนำ (มล./น้ำ 20 ลิตร):</label>
+            <input type="number" id="hormoneConcentration" required min="0" step="0.1">
+            
+            <h2>ยาฆ่าหญ้า</h2>
+            <label for="herbicideType">ชนิดยาฆ่าหญ้า:</label>
+            <select id="herbicideType" required>
+                <option value="">เลือกชนิดยาฆ่าหญ้า</option>
+                <option value="glyphosate">ไกลโฟเสต (Glyphosate)</option>
+                <option value="paraquat">พาราควอต (Paraquat)</option>
+                <option value="2-4D">2,4-D</option>
+            </select>
+            
+            <label for="herbicideConcentration">ความเข้มข้นที่แนะนำ (มล./น้ำ 20 ลิตร):</label>
+            <input type="number" id="herbicideConcentration" required min="0" step="0.1">
+            
+            <button type="submit">คำนวณ</button>
+        </form>
+        
+        <div id="result" class="result" style="display: none;">
+            <h3>ผลการคำนวณ</h3>
+            <p>ขนาดแปลง: <span id="resultFieldSize"></span> ไร่</p>
+            <p>ปริมาณน้ำที่ต้องใช้: <span id="resultWaterAmount"></span> ลิตร</p>
+            <p>ปริมาณฮอร์โมนที่ต้องใช้: <span id="resultHormoneAmount"></span> มล.</p>
+            <p>ปริมาณยาฆ่าหญ้าที่ต้องใช้: <span id="resultHerbicideAmount"></span> มล.</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('chemicalForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const fieldSize = parseFloat(document.getElementById('fieldSize').value);
+            const hormoneConcentration = parseFloat(document.getElementById('hormoneConcentration').value);
+            const herbicideConcentration = parseFloat(document.getElementById('herbicideConcentration').value);
+            
+            // คำนวณปริมาณน้ำที่ต้องใช้ (สมมติว่าใช้น้ำ 80 ลิตรต่อไร่)
+            const waterAmount = fieldSize * 80;
+            
+            // คำนวณปริมาณฮอร์โมนและยาฆ่าหญ้า
+            const hormoneAmount = (waterAmount / 20) * hormoneConcentration;
+            const herbicideAmount = (waterAmount / 20) * herbicideConcentration;
+            
+            // แสดงผลลัพธ์
+            document.getElementById('resultFieldSize').textContent = fieldSize;
+            document.getElementById('resultWaterAmount').textContent = waterAmount.toFixed(2);
+            document.getElementById('resultHormoneAmount').textContent = hormoneAmount.toFixed(2);
+            document.getElementById('resultHerbicideAmount').textContent = herbicideAmount.toFixed(2);
+            
+            document.getElementById('result').style.display = 'block';
+        });
+    </script>
+</body>
+</html>

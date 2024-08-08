@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>พยากรณ์อากาศ - ระบบปลูกมันสำปะหลัง</title>
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 1em;
+        }
+        nav {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        nav ul li {
+            display: inline;
+            margin-right: 10px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+        }
+        .weather-section {
+            background-color: white;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .weather-today {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+        }
+        .weather-icon {
+            font-size: 4em;
+        }
+        .weather-details {
+            text-align: left;
+        }
+        .weather-weekly {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .weather-day {
+            text-align: center;
+            width: calc(14.28% - 10px);
+            margin: 5px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .recommendation {
+            background-color: #e7f3ff;
+            border-left: 5px solid #2196F3;
+            padding: 15px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>ระบบปลูกมันสำปะหลัง</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="#">แดชบอร์ด</a></li>
+            <li><a href="#">จัดการแปลง</a></li>
+            <li><a href="#" class="active">พยากรณ์อากาศ</a></li>
+            <li><a href="#">กิจกรรม</a></li>
+            <li><a href="#">การเงิน</a></li>
+            <li><a href="#">รายงาน</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1>พยากรณ์อากาศสำหรับพื้นที่เพาะปลูก</h1>
+        <div class="weather-section">
+            <h2>พยากรณ์อากาศวันนี้</h2>
+            <div class="weather-today">
+                <div class="weather-icon">☀️</div>
+                <div class="weather-details">
+                    <h3>วันที่ <span id="today-date"></span></h3>
+                    <p>อุณหภูมิ: <span id="today-temp"></span>°C</p>
+                    <p>ความชื้น: <span id="today-humidity"></span>%</p>
+                    <p>โอกาสฝนตก: <span id="today-rain-chance"></span>%</p>
+                    <p>ความเร็วลม: <span id="today-wind-speed"></span> กม./ชม.</p>
+                </div>
+            </div>
+            <div class="recommendation">
+                <h3>คำแนะนำสำหรับวันนี้:</h3>
+                <p id="today-recommendation"></p>
+            </div>
+        </div>
+        <div class="weather-section">
+            <h2>พยากรณ์อากาศรายสัปดาห์</h2>
+            <div class="weather-weekly" id="weekly-forecast">
+                <!-- จะถูกเติมด้วย JavaScript -->
+            </div>
+            <div class="recommendation">
+                <h3>คำแนะนำสำหรับสัปดาห์นี้:</h3>
+                <p id="weekly-recommendation"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ฟังก์ชันสำหรับสร้างข้อมูลสภาพอากาศจำลอง
+        function generateWeatherData() {
+            const today = new Date();
+            const weeklyData = [];
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(today);
+                date.setDate(today.getDate() + i);
+                weeklyData.push({
+                    date: date,
+                    temp: Math.round(Math.random() * (35 - 25) + 25),
+                    humidity: Math.round(Math.random() * (90 - 60) + 60),
+                    rainChance: Math.round(Math.random() * 100),
+                    windSpeed: Math.round(Math.random() * (20 - 5) + 5)
+                });
+            }
+            return weeklyData;
+        }
+
+        // ฟังก์ชันสำหรับแสดงข้อมูลพยากรณ์อากาศวันนี้
+        function displayTodayWeather(data) {
+            document.getElementById('today-date').textContent = data.date.toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('today-temp').textContent = data.temp;
+            document.getElementById('today-humidity').textContent = data.humidity;
+            document.getElementById('today-rain-chance').textContent = data.rainChance;
+            document.getElementById('today-wind-speed').textContent = data.windSpeed;
+
+            // สร้างคำแนะนำ
+            let recommendation = "วันนี้อากาศ";
+            if (data.temp > 30) {
+                recommendation += "ร้อน ควรให้น้ำพืชเพิ่มเติม";
+            } else if (data.temp < 25) {
+                recommendation += "เย็น ระวังโรคพืชที่เกิดในอากาศเย็นชื้น";
+            }
+            if (data.rainChance > 60) {
+                recommendation += " และมีโอกาสฝนตกสูง ควรเตรียมการระบายน้ำในแปลง";
+            }
+            document.getElementById('today-recommendation').textContent = recommendation;
+        }
+
+        // ฟังก์ชันสำหรับแสดงข้อมูลพยากรณ์อากาศรายสัปดาห์
+        function displayWeeklyWeather(weeklyData) {
+            const weeklyForecast = document.getElementById('weekly-forecast');
+            weeklyForecast.innerHTML = '';
+            weeklyData.forEach(data => {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'weather-day';
+                dayElement.innerHTML = `
+                    <h4>${data.date.toLocaleDateString('th-TH', { weekday: 'short' })}</h4>
+                    <div class="weather-icon">${data.rainChance > 50 ? '🌧️' : '☀️'}</div>
+                    <p>${data.temp}°C</p>
+                    <p>${data.rainChance}% ฝน</p>
+                `;
+                weeklyForecast.appendChild(dayElement);
+            });
+
+            // สร้างคำแนะนำรายสัปดาห์
+            let weeklyRecommendation = "สัปดาห์นี้";
+            const avgTemp = weeklyData.reduce((sum, data) => sum + data.temp, 0) / weeklyData.length;
+            const rainyDays = weeklyData.filter(data => data.rainChance > 50).length;
+
+            if (avgTemp > 30) {
+                weeklyRecommendation += "อากาศค่อนข้างร้อน ควรวางแผนให้น้ำพืชอย่างสม่ำเสมอ";
+            } else if (avgTemp < 25) {
+                weeklyRecommendation += "อากาศค่อนข้างเย็น ควรระวังโรคพืชที่เกิดในอากาศเย็นชื้น";
+            }
+
+            if (rainyDays >= 3) {
+                weeklyRecommendation += " และมีฝนตกหลายวัน ควรตรวจสอบการระบายน้ำในแปลงและระวังโรคพืชที่เกิดจากความชื้นสูง";
+            }
+
+            document.getElementById('weekly-recommendation').textContent = weeklyRecommendation;
+        }
+
+        // สร้างและแสดงข้อมูลพยากรณ์อากาศ
+        const weatherData = generateWeatherData();
+        displayTodayWeather(weatherData[0]);
+        displayWeeklyWeather(weatherData);
+    </script>
+</body>
+</html>

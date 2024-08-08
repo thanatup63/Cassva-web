@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จัดการกิจกรรม - ระบบปลูกมันสำปะหลัง</title>
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 1em;
+        }
+        nav {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        nav ul li {
+            display: inline;
+            margin-right: 10px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+        }
+        .activity-form, .activity-list {
+            background-color: white;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .activity-form input, .activity-form select, .activity-form button {
+            margin: 10px 0;
+            padding: 5px;
+            width: 100%;
+        }
+        .activity-item {
+            border-bottom: 1px solid #eee;
+            padding: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .activity-info {
+            flex-grow: 1;
+        }
+        .activity-actions button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .edit-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+        }
+        .delete-button {
+            background-color: #f44336;
+            color: white;
+            border: none;
+        }
+        .complete-button {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+        }
+        .completed {
+            text-decoration: line-through;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>ระบบปลูกมันสำปะหลัง</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="#">แดชบอร์ด</a></li>
+            <li><a href="#">จัดการแปลง</a></li>
+            <li><a href="#">พยากรณ์อากาศ</a></li>
+            <li><a href="#" class="active">กิจกรรม</a></li>
+            <li><a href="#">การเงิน</a></li>
+            <li><a href="#">รายงาน</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1>จัดการกิจกรรม</h1>
+        <div class="activity-form">
+            <h2>เพิ่ม/แก้ไขกิจกรรม</h2>
+            <form id="activityForm">
+                <input type="hidden" id="activityId">
+                <input type="text" id="activityName" placeholder="ชื่อกิจกรรม" required>
+                <input type="date" id="activityDate" required>
+                <select id="activityPlot" required>
+                    <option value="">เลือกแปลง</option>
+                    <option value="1">แปลง A</option>
+                    <option value="2">แปลง B</option>
+                </select>
+                <textarea id="activityDescription" placeholder="รายละเอียดกิจกรรม" rows="3"></textarea>
+                <button type="submit" id="submitButton">เพิ่มกิจกรรม</button>
+            </form>
+        </div>
+        <div class="activity-list">
+            <h2>รายการกิจกรรม</h2>
+            <div id="activityList"></div>
+        </div>
+    </div>
+
+    <script>
+        // ข้อมูลจำลอง (ในระบบจริงควรใช้ฐานข้อมูล)
+        let activities = [
+            { id: 1, name: 'รดน้ำ', date: '2024-08-10', plot: 'แปลง A', description: 'รดน้ำทั่วแปลง', completed: false },
+            { id: 2, name: 'ใส่ปุ๋ย', date: '2024-08-12', plot: 'แปลง B', description: 'ใส่ปุ๋ยสูตร 15-15-15', completed: false }
+        ];
+
+        // แสดงรายการกิจกรรม
+        function displayActivities() {
+            const activityList = document.getElementById('activityList');
+            activityList.innerHTML = '';
+            activities.forEach(activity => {
+                const activityItem = document.createElement('div');
+                activityItem.className = `activity-item ${activity.completed ? 'completed' : ''}`;
+                activityItem.innerHTML = `
+                    <div class="activity-info">
+                        <h3>${activity.name}</h3>
+                        <p>วันที่: ${activity.date}</p>
+                        <p>แปลง: ${activity.plot}</p>
+                        <p>รายละเอียด: ${activity.description}</p>
+                    </div>
+                    <div class="activity-actions">
+                        <button class="edit-button" onclick="editActivity(${activity.id})">แก้ไข</button>
+                        <button class="delete-button" onclick="deleteActivity(${activity.id})">ลบ</button>
+                        <button class="complete-button" onclick="toggleComplete(${activity.id})">
+                            ${activity.completed ? 'ยกเลิกเสร็จสิ้น' : 'เสร็จสิ้น'}
+                        </button>
+                    </div>
+                `;
+                activityList.appendChild(activityItem);
+            });
+        }
+
+        // เพิ่มหรือแก้ไขกิจกรรม
+        document.getElementById('activityForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const activityId = document.getElementById('activityId').value;
+            const activityData = {
+                name: document.getElementById('activityName').value,
+                date: document.getElementById('activityDate').value,
+                plot: document.getElementById('activityPlot').options[document.getElementById('activityPlot').selectedIndex].text,
+                description: document.getElementById('activityDescription').value,
+                completed: false
+            };
+
+            if (activityId) {
+                // แก้ไขกิจกรรม
+                const index = activities.findIndex(activity => activity.id == activityId);
+                if (index !== -1) {
+                    activities[index] = { ...activities[index], ...activityData };
+                }
+            } else {
+                // เพิ่มกิจกรรมใหม่
+                const newActivity = { id: activities.length + 1, ...activityData };
+                activities.push(newActivity);
+            }
+
+            displayActivities();
+            this.reset();
+            document.getElementById('activityId').value = '';
+            document.getElementById('submitButton').textContent = 'เพิ่มกิจกรรม';
+        });
+
+        // แก้ไขกิจกรรม
+        function editActivity(id) {
+            const activity = activities.find(activity => activity.id == id);
+            if (activity) {
+                document.getElementById('activityId').value = activity.id;
+                document.getElementById('activityName').value = activity.name;
+                document.getElementById('activityDate').value = activity.date;
+                document.getElementById('activityPlot').value = activity.plot === 'แปลง A' ? '1' : '2';
+                document.getElementById('activityDescription').value = activity.description;
+                document.getElementById('submitButton').textContent = 'แก้ไขกิจกรรม';
+            }
+        }
+
+        // ลบกิจกรรม
+        function deleteActivity(id) {
+            if (confirm('คุณแน่ใจหรือไม่ที่จะลบกิจกรรมนี้?')) {
+                activities = activities.filter(activity => activity.id != id);
+                displayActivities();
+            }
+        }
+
+        // สลับสถานะเสร็จสิ้น
+        function toggleComplete(id) {
+            const index = activities.findIndex(activity => activity.id == id);
+            if (index !== -1) {
+                activities[index].completed = !activities[index].completed;
+                displayActivities();
+            }
+        }
+
+        // แสดงรายการกิจกรรมเมื่อโหลดหน้า
+        displayActivities();
+    </script>
+</body>
+</html>

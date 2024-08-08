@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จัดการข้อมูลแปลง - ระบบปลูกมันสำปะหลัง</title>
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 1em;
+        }
+        nav {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        nav ul li {
+            display: inline;
+            margin-right: 10px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+        }
+        .plot-form {
+            background-color: white;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .plot-form input, .plot-form button {
+            margin: 10px 0;
+            padding: 5px;
+            width: 100%;
+        }
+        .plot-list {
+            background-color: white;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .plot-item {
+            border-bottom: 1px solid #eee;
+            padding: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .plot-info {
+            flex-grow: 1;
+        }
+        .plot-actions button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .edit-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+        }
+        .delete-button {
+            background-color: #f44336;
+            color: white;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>ระบบปลูกมันสำปะหลัง</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="#">แดชบอร์ด</a></li>
+            <li><a href="#" class="active">จัดการแปลง</a></li>
+            <li><a href="#">พยากรณ์อากาศ</a></li>
+            <li><a href="#">กิจกรรม</a></li>
+            <li><a href="#">การเงิน</a></li>
+            <li><a href="#">รายงาน</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1>จัดการข้อมูลแปลง</h1>
+        <div class="plot-form">
+            <h2>เพิ่ม/แก้ไขแปลง</h2>
+            <form id="plotForm">
+                <input type="hidden" id="plotId">
+                <input type="text" id="plotName" placeholder="ชื่อแปลง" required>
+                <input type="number" id="plotArea" placeholder="พื้นที่ (ไร่)" required>
+                <input type="text" id="plotLocation" placeholder="พิกัด GPS" required>
+                <input type="file" id="plotImage" accept="image/*">
+                <button type="submit" id="submitButton">เพิ่มแปลง</button>
+            </form>
+        </div>
+        <div class="plot-list">
+            <h2>รายการแปลง</h2>
+            <div id="plotList"></div>
+        </div>
+    </div>
+
+    <script>
+        // ข้อมูลจำลอง (ในระบบจริงควรใช้ฐานข้อมูล)
+        let plots = [
+            { id: 1, name: 'แปลง A', area: 10, location: '13.7563°N, 100.5018°E' },
+            { id: 2, name: 'แปลง B', area: 15, location: '13.7650°N, 100.5380°E' }
+        ];
+
+        // แสดงรายการแปลง
+        function displayPlots() {
+            const plotList = document.getElementById('plotList');
+            plotList.innerHTML = '';
+            plots.forEach(plot => {
+                const plotItem = document.createElement('div');
+                plotItem.className = 'plot-item';
+                plotItem.innerHTML = `
+                    <div class="plot-info">
+                        <h3>${plot.name}</h3>
+                        <p>พื้นที่: ${plot.area} ไร่</p>
+                        <p>ตำแหน่ง: ${plot.location}</p>
+                    </div>
+                    <div class="plot-actions">
+                        <button class="edit-button" onclick="editPlot(${plot.id})">แก้ไข</button>
+                        <button class="delete-button" onclick="deletePlot(${plot.id})">ลบ</button>
+                    </div>
+                `;
+                plotList.appendChild(plotItem);
+            });
+        }
+
+        // เพิ่มหรือแก้ไขแปลง
+        document.getElementById('plotForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const plotId = document.getElementById('plotId').value;
+            const plotData = {
+                name: document.getElementById('plotName').value,
+                area: parseFloat(document.getElementById('plotArea').value),
+                location: document.getElementById('plotLocation').value
+            };
+
+            if (plotId) {
+                // แก้ไขแปลง
+                const index = plots.findIndex(plot => plot.id == plotId);
+                if (index !== -1) {
+                    plots[index] = { ...plots[index], ...plotData };
+                }
+            } else {
+                // เพิ่มแปลงใหม่
+                const newPlot = { id: plots.length + 1, ...plotData };
+                plots.push(newPlot);
+            }
+
+            displayPlots();
+            this.reset();
+            document.getElementById('plotId').value = '';
+            document.getElementById('submitButton').textContent = 'เพิ่มแปลง';
+        });
+
+        // แก้ไขแปลง
+        function editPlot(id) {
+            const plot = plots.find(plot => plot.id == id);
+            if (plot) {
+                document.getElementById('plotId').value = plot.id;
+                document.getElementById('plotName').value = plot.name;
+                document.getElementById('plotArea').value = plot.area;
+                document.getElementById('plotLocation').value = plot.location;
+                document.getElementById('submitButton').textContent = 'แก้ไขแปลง';
+            }
+        }
+
+        // ลบแปลง
+        function deletePlot(id) {
+            if (confirm('คุณแน่ใจหรือไม่ที่จะลบแปลงนี้?')) {
+                plots = plots.filter(plot => plot.id != id);
+                displayPlots();
+            }
+        }
+
+        // แสดงรายการแปลงเมื่อโหลดหน้า
+        displayPlots();
+    </script>
+</body>
+</html>

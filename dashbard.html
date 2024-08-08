@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แดชบอร์ด - ระบบปลูกมันสำปะหลัง</title>
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 1em;
+        }
+        nav {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        nav ul li {
+            display: inline;
+            margin-right: 10px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .dashboard-item {
+            background-color: white;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .dashboard-item h2 {
+            margin-top: 0;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>ระบบปลูกมันสำปะหลัง</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="#" class="active">แดชบอร์ด</a></li>
+            <li><a href="#">จัดการแปลง</a></li>
+            <li><a href="#">พยากรณ์อากาศ</a></li>
+            <li><a href="#">กิจกรรม</a></li>
+            <li><a href="#">การเงิน</a></li>
+            <li><a href="#">รายงาน</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1>แดชบอร์ด</h1>
+        <div class="dashboard-grid">
+            <div class="dashboard-item">
+                <h2>สรุปข้อมูลแปลง</h2>
+                <p>จำนวนแปลงทั้งหมด: <span id="totalPlots">0</span></p>
+                <p>พื้นที่รวม: <span id="totalArea">0</span> ไร่</p>
+            </div>
+            <div class="dashboard-item">
+                <h2>สภาพอากาศ</h2>
+                <p>อุณหภูมิ: <span id="temperature">-</span>°C</p>
+                <p>ความชื้น: <span id="humidity">-</span>%</p>
+            </div>
+            <div class="dashboard-item">
+                <h2>กิจกรรมที่ต้องทำ</h2>
+                <ul id="todoList">
+                    <li>ไม่มีกิจกรรมในขณะนี้</li>
+                </ul>
+            </div>
+            <div class="dashboard-item">
+                <h2>สรุปการเงิน</h2>
+                <p>รายรับ: <span id="income">0</span> บาท</p>
+                <p>รายจ่าย: <span id="expense">0</span> บาท</p>
+                <p>กำไร/ขาดทุน: <span id="profit">0</span> บาท</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ข้อมูลจำลอง (ในระบบจริงควรดึงข้อมูลจาก API)
+        const dashboardData = {
+            totalPlots: 5,
+            totalArea: 50,
+            temperature: 30,
+            humidity: 70,
+            todoList: ['รดน้ำแปลง A', 'ใส่ปุ๋ยแปลง B', 'กำจัดวัชพืชแปลง C'],
+            income: 100000,
+            expense: 50000
+        };
+
+        // อัปเดตข้อมูลในแดชบอร์ด
+        document.getElementById('totalPlots').textContent = dashboardData.totalPlots;
+        document.getElementById('totalArea').textContent = dashboardData.totalArea;
+        document.getElementById('temperature').textContent = dashboardData.temperature;
+        document.getElementById('humidity').textContent = dashboardData.humidity;
+        document.getElementById('income').textContent = dashboardData.income.toLocaleString();
+        document.getElementById('expense').textContent = dashboardData.expense.toLocaleString();
+        document.getElementById('profit').textContent = (dashboardData.income - dashboardData.expense).toLocaleString();
+
+        // อัปเดตรายการกิจกรรม
+        const todoList = document.getElementById('todoList');
+        todoList.innerHTML = '';
+        dashboardData.todoList.forEach(item => {
+            const li = document.createElement('li');
+            li.textContent = item;
+            todoList.appendChild(li);
+        });
+    </script>
+</body>
+</html>
